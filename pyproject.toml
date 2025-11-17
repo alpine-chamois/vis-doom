@@ -1,0 +1,10 @@
+[project]
+name = "vis-doom"
+version = "0.1.0"
+description = "Training a visual RL agent to play Doom like it's 1993!"
+readme = "README.md"
+requires-python = "==3.12.*"
+dependencies = [
+    "vizdoom",
+    "gymnasium",
+]

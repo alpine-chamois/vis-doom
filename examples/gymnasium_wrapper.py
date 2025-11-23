@@ -1,9 +1,4 @@
-#!/usr/bin/env python3
-
-#####################################################################
-# Example for running a vizdoom scenario as a Gymnasium env
-#####################################################################
-
+# https://github.com/Farama-Foundation/ViZDoom/blob/master/examples/python/gymnasium_wrapper.py
 import gymnasium
 
 from vizdoom import gymnasium_wrapper  # noqa

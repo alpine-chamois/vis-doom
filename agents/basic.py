@@ -53,6 +53,7 @@ def make_env(render_mode="none"):
         env = ObservationWrapper(env)
         env = TransformReward(env, lambda r: float(r) * REWARD_SCALE)
         env = Monitor(env)
+        # TODO: Consider frame stacking
         return env
 
     return _env_factory
@@ -97,3 +98,4 @@ if __name__ == "__main__":
     main()
 
 # TODO: Parameterise for either training or evaluation (with rendering) of a trained model
+

@@ -1,29 +1,42 @@
 from pathlib import Path
+import cv2
+import numpy as np
 import gymnasium
 from gymnasium.envs.registration import register
 from stable_baselines3 import ppo
 from stable_baselines3.common import callbacks
 from stable_baselines3.common import policies
-from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv
+from stable_baselines3.common.vec_env import (
+    SubprocVecEnv,
+    DummyVecEnv,
+    VecTransposeImage,
+    VecFrameStack,
+)
 from stable_baselines3.common.monitor import Monitor
 from gymnasium.wrappers import TransformReward
 
+# Config
 ENV = "MyVizdoomBasic-v0"
 SCENARIO_DIR = Path(__file__).parent.parent / "scenarios"
 CFG_FILE = SCENARIO_DIR / "basic.cfg"
 LOG_NAME = "basic"
 LOG_DIR = "logs/basic/"
 MODEL_DIR = "models/basic/"
+OBS_KEY = "screen"
+
+# Hyperparameters
 TRAINING_STEPS = 25000
 FRAME_SKIP = 4
-NUM_ENVS = 1  # 4
+FRAME_STACK = 1
+NUM_ENVS = 2
 NUM_EVAL_EPISODES = 10
-EVAL_FREQ = 500  # 2500
+EVAL_FREQ = 1024
 LEARNING_RATE = 1e-4
-OBS_KEY = "screen"
 N_STEPS = 128
 VERBOSE = 1
 REWARD_SCALE = 0.01
+SCREEN_WIDTH = 80
+SCREEN_HEIGHT = 60
 
 # Register custom VizDoom environment with local scenario file
 register(
@@ -35,15 +48,36 @@ register(
 )
 
 
-# Environment wrapper to extract only the screen observation
+# Environment wrapper to extract the screen from the observation
 class ObservationWrapper(gymnasium.ObservationWrapper):
     def __init__(self, env):
         super().__init__(env)
-        # Replace the dict space with only the screen box
+        # Update onservation space
         self.observation_space = env.observation_space[OBS_KEY]  # type: ignore
 
     def observation(self, observation):
         return observation[OBS_KEY]
+
+
+# Environment wrapper to resize the screen
+class ResizeWrapper(gymnasium.ObservationWrapper):
+    def __init__(self, env, width, height):
+        super().__init__(env)
+        self.width = width
+        self.height = height
+        # Update observation space
+        self.observation_space = gymnasium.spaces.Box(
+            low=0,
+            high=255,
+            shape=(self.height, self.width, env.observation_space.shape[2]),
+            dtype=np.uint8,
+        )
+
+    def observation(self, observation):
+        observation = cv2.resize(
+            observation, (self.width, self.height), interpolation=cv2.INTER_AREA
+        )
+        return observation
 
 
 # Environment factory to wrap the environment creation
@@ -51,20 +85,27 @@ def make_env(render_mode="none"):
     def _env_factory():
         env = gymnasium.make(ENV, render_mode=render_mode, frame_skip=FRAME_SKIP)
         env = ObservationWrapper(env)
-        env = TransformReward(env, lambda r: float(r) * REWARD_SCALE)
+        env = ResizeWrapper(env, width=SCREEN_WIDTH, height=SCREEN_HEIGHT)
+        env = TransformReward(env, lambda r: float(r) * REWARD_SCALE)  # Scale reward
         env = Monitor(env)
-        # TODO: Frame stacking
-        # TODO: VecTransposeImage
-        # TODO: Reduce image size here with CV2 rather than in CFG file
         return env
 
     return _env_factory
 
 
+# Environment wrapper to wrap the vectorised environment
+def wrap_vec_env(vec_env):
+    vec_env = VecTransposeImage(vec_env)
+    vec_env = VecFrameStack(vec_env, n_stack=FRAME_STACK)
+    return vec_env
+
+
 def main():
     # Create the training and evaluation environments
-    training_env = SubprocVecEnv([make_env("none") for _ in range(NUM_ENVS)])
-    evaluation_env = DummyVecEnv([make_env("human")])
+    training_env = wrap_vec_env(
+        SubprocVecEnv([make_env("none") for _ in range(NUM_ENVS)])
+    )
+    evaluation_env = wrap_vec_env(DummyVecEnv([make_env("none")]))
 
     # Create the agent
     agent = ppo.PPO(
@@ -100,5 +141,3 @@ if __name__ == "__main__":
     main()
 
 # TODO: Parameterise for either training or evaluation (with rendering) of a trained model
-
-

@@ -8,5 +8,7 @@ dependencies = [
     "vizdoom",
     "gymnasium",
     "stable_baselines3",
-    "tensorboard"
+    "tensorboard",
+    "numpy",
+    "opencv-python",
 ]

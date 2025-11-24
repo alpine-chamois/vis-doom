@@ -6,3 +6,4 @@ logs/basic/*
 !logs/basic/
 !logs/basic/best_model/
 !logs/basic/best_model/**
+!logs/basic/evaluations.npz

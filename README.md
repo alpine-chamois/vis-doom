@@ -13,10 +13,10 @@ Run the following commands to train, and monitor the agent:
 
 ```tensorboard --logdir logs```
 
-Here's how it trains:
-
 ![Training Plots](/images/basic-training.png)
 
-And here it is playing the game:
+Run the following command to demo the trained agent:
+
+```uv run agents/basic.py```
 
 ![Basic Scenario](/images/basic-render.png)

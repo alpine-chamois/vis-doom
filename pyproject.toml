@@ -11,4 +11,5 @@ dependencies = [
     "tensorboard",
     "numpy",
     "opencv-python",
+    "argparse"
 ]

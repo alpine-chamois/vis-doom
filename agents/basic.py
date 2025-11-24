@@ -1,3 +1,5 @@
+import argparse
+import time
 from pathlib import Path
 import cv2
 import numpy as np
@@ -23,20 +25,22 @@ LOG_NAME = "basic"
 LOG_DIR = "logs/basic/"
 MODEL_DIR = "models/basic/"
 OBS_KEY = "screen"
-
-# Hyperparameters
+MODEL_NAME = "best_model.zip"
+RGB = "rgb_array"
+HUMAN = "human"
 TRAINING_STEPS = 25000
 FRAME_SKIP = 4
-FRAME_STACK = 1
-NUM_ENVS = 2
+FRAME_STACK = 4
+NUM_ENVS = 4
 NUM_EVAL_EPISODES = 10
-EVAL_FREQ = 1024
-LEARNING_RATE = 1e-4
+EVAL_FREQ = 500
+LEARNING_RATE = 1e-3
 N_STEPS = 128
 VERBOSE = 1
 REWARD_SCALE = 0.01
 SCREEN_WIDTH = 80
 SCREEN_HEIGHT = 60
+NUM_DEMO_EPISODES = 10
 
 # Register custom VizDoom environment with local scenario file
 register(
@@ -81,7 +85,7 @@ class ResizeWrapper(gymnasium.ObservationWrapper):
 
 
 # Environment factory to wrap the environment creation
-def make_env(render_mode="none"):
+def make_env(render_mode=RGB):
     def _env_factory():
         env = gymnasium.make(ENV, render_mode=render_mode, frame_skip=FRAME_SKIP)
         env = ObservationWrapper(env)
@@ -100,12 +104,11 @@ def wrap_vec_env(vec_env):
     return vec_env
 
 
-def main():
+# Train the agent
+def train():
     # Create the training and evaluation environments
-    training_env = wrap_vec_env(
-        SubprocVecEnv([make_env("none") for _ in range(NUM_ENVS)])
-    )
-    evaluation_env = wrap_vec_env(DummyVecEnv([make_env("none")]))
+    training_env = wrap_vec_env(SubprocVecEnv([make_env(RGB) for _ in range(NUM_ENVS)]))
+    evaluation_env = wrap_vec_env(DummyVecEnv([make_env(RGB)]))
 
     # Create the agent
     agent = ppo.PPO(
@@ -137,7 +140,40 @@ def main():
     evaluation_env.close()
 
 
+# Demo the agent
+def demo():
+    # Load moedel
+    model_path = Path(MODEL_DIR) / MODEL_NAME
+    model = ppo.PPO.load(model_path)
+
+    # Create the demo environment
+    demo_env = wrap_vec_env(DummyVecEnv([make_env(HUMAN)]))
+
+    # Initialisedemo
+    observation = demo_env.reset()
+
+    # Run demo
+    for _ in range(NUM_DEMO_EPISODES):
+        done = [False]
+        while not done[0]:
+            action, _ = model.predict(observation, deterministic=True)  # type: ignore
+            observation, _, done, _ = demo_env.step(action)
+            time.sleep(0.2)
+        observation = demo_env.reset()
+
+    demo_env.close()
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--train", action="store_true")
+    args = parser.parse_args()
+
+    if args.train:
+        train()
+    else:
+        demo()
+
+
 if __name__ == "__main__":
     main()
-
-# TODO: Parameterise for either training or evaluation (with rendering) of a trained model

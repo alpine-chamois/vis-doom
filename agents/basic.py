@@ -1,5 +1,4 @@
 import argparse
-import time
 from pathlib import Path
 import cv2
 import numpy as np
@@ -84,10 +83,37 @@ class ResizeWrapper(gymnasium.ObservationWrapper):
         return observation
 
 
+# Environment wrapper to implement frame skipping without affecting rendering
+class FrameSkipWrapper(gymnasium.Wrapper):
+    def __init__(self, env, skip):
+        super().__init__(env)
+        self.skip = skip
+
+    def step(self, action):
+        total_reward = 0.0
+        obs = None
+        terminated = False
+        truncated = False
+
+        for _ in range(self.skip):
+            obs, reward, terminated, truncated, info = self.env.step(action)
+            total_reward += reward  # type: ignore
+
+            # Always render intermediate frames
+            self.env.render()
+
+            if terminated or truncated:
+                break
+
+        return obs, total_reward, terminated, truncated, info
+
+
 # Environment factory to wrap the environment creation
-def make_env(render_mode=RGB):
+def make_env(render_mode):
     def _env_factory():
-        env = gymnasium.make(ENV, render_mode=render_mode, frame_skip=FRAME_SKIP)
+        env = gymnasium.make(ENV, render_mode=render_mode)
+        # Custom frame skip wrapper that still renders all frames
+        env = FrameSkipWrapper(env, skip=FRAME_SKIP)
         env = ObservationWrapper(env)
         env = ResizeWrapper(env, width=SCREEN_WIDTH, height=SCREEN_HEIGHT)
         env = TransformReward(env, lambda r: float(r) * REWARD_SCALE)  # Scale reward
@@ -149,7 +175,7 @@ def demo():
     # Create the demo environment
     demo_env = wrap_vec_env(DummyVecEnv([make_env(HUMAN)]))
 
-    # Initialisedemo
+    # Initialise demo
     observation = demo_env.reset()
 
     # Run demo
@@ -158,7 +184,6 @@ def demo():
         while not done[0]:
             action, _ = model.predict(observation, deterministic=True)  # type: ignore
             observation, _, done, _ = demo_env.step(action)
-            time.sleep(0.2)
         observation = demo_env.reset()
 
     demo_env.close()

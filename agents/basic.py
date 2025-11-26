@@ -1,10 +1,12 @@
 import argparse
 from pathlib import Path
+from typing import Callable
 import cv2
 import numpy as np
 import gymnasium
+from gymnasium import Env, ObservationWrapper
 from gymnasium.envs.registration import register
-from stable_baselines3 import ppo
+from stable_baselines3.ppo import PPO
 from stable_baselines3.common import callbacks
 from stable_baselines3.common import policies
 from stable_baselines3.common.vec_env import (
@@ -12,6 +14,7 @@ from stable_baselines3.common.vec_env import (
     DummyVecEnv,
     VecTransposeImage,
     VecFrameStack,
+    VecEnv,
 )
 from stable_baselines3.common.monitor import Monitor
 from gymnasium.wrappers import TransformReward
@@ -51,20 +54,29 @@ register(
 )
 
 
-# Environment wrapper to extract the screen from the observation
-class ObservationWrapper(gymnasium.ObservationWrapper):
-    def __init__(self, env):
+class ScreenWrapper(ObservationWrapper):
+    """
+    Wrapper to extract the screen from the observation dictionary.
+    """
+
+    def __init__(self, env: Env) -> None:
         super().__init__(env)
         # Update onservation space
         self.observation_space = env.observation_space[OBS_KEY]  # type: ignore
 
-    def observation(self, observation):
+    def observation(self, observation: dict) -> np.ndarray:
+        """
+        Extract the screen from the observation dictionary.
+        """
         return observation[OBS_KEY]
 
 
-# Environment wrapper to resize the screen
-class ResizeWrapper(gymnasium.ObservationWrapper):
-    def __init__(self, env, width, height):
+class ResizeWrapper(ObservationWrapper):
+    """
+    Wrapper to resize the observation to the given width and height.
+    """
+
+    def __init__(self, env: Env, width: int, height: int) -> None:
         super().__init__(env)
         self.width = width
         self.height = height
@@ -72,28 +84,37 @@ class ResizeWrapper(gymnasium.ObservationWrapper):
         self.observation_space = gymnasium.spaces.Box(
             low=0,
             high=255,
-            shape=(self.height, self.width, env.observation_space.shape[2]),
+            shape=(self.height, self.width, env.observation_space.shape[2]),  # type: ignore
             dtype=np.uint8,
         )
 
-    def observation(self, observation):
+    def observation(self, observation: np.ndarray) -> np.ndarray:
+        """
+        Resize the observation to the specified width and height.
+        """
         observation = cv2.resize(
             observation, (self.width, self.height), interpolation=cv2.INTER_AREA
         )
         return observation
 
 
-# Environment wrapper to implement frame skipping without affecting rendering
 class FrameSkipWrapper(gymnasium.Wrapper):
-    def __init__(self, env, skip):
+    """
+    Wrapper to implement frame skipping without affecting rendering.
+    """
+
+    def __init__(self, env: Env, skip: int) -> None:
         super().__init__(env)
         self.skip = skip
 
-    def step(self, action):
-        total_reward = 0.0
-        obs = None
-        terminated = False
-        truncated = False
+    def step(self, action: np.ndarray) -> tuple[np.ndarray, float, bool, bool, dict]:
+        """
+        Repeat action, sum reward, and render all intermediate frames.
+        """
+        total_reward: float = 0.0
+        obs: np.ndarray = np.array([])
+        terminated: bool = False
+        truncated: bool = False
 
         for _ in range(self.skip):
             obs, reward, terminated, truncated, info = self.env.step(action)
@@ -108,13 +129,19 @@ class FrameSkipWrapper(gymnasium.Wrapper):
         return obs, total_reward, terminated, truncated, info
 
 
-# Environment factory to wrap the environment creation
-def make_env(render_mode):
-    def _env_factory():
+def make_env(render_mode: str) -> Callable[[], Env]:
+    """
+    Factory function to create the environment with the necessary wrappers.
+    """
+
+    def _env_factory() -> Env:
+        """
+        Create the environment with the necessary wrappers.
+        """
         env = gymnasium.make(ENV, render_mode=render_mode)
         # Custom frame skip wrapper that still renders all frames
         env = FrameSkipWrapper(env, skip=FRAME_SKIP)
-        env = ObservationWrapper(env)
+        env = ScreenWrapper(env)
         env = ResizeWrapper(env, width=SCREEN_WIDTH, height=SCREEN_HEIGHT)
         env = TransformReward(env, lambda r: float(r) * REWARD_SCALE)  # Scale reward
         env = Monitor(env)
@@ -123,21 +150,26 @@ def make_env(render_mode):
     return _env_factory
 
 
-# Environment wrapper to wrap the vectorised environment
-def wrap_vec_env(vec_env):
+def wrap_vec_env(vec_env: VecEnv) -> VecEnv:
+    """
+    Apply wrappers to the vectorized environment.
+    """
     vec_env = VecTransposeImage(vec_env)
     vec_env = VecFrameStack(vec_env, n_stack=FRAME_STACK)
     return vec_env
 
 
 # Train the agent
-def train():
+def train() -> None:
+    """
+    Train the PPO agent on the VizDoom scenario.
+    """
     # Create the training and evaluation environments
     training_env = wrap_vec_env(SubprocVecEnv([make_env(RGB) for _ in range(NUM_ENVS)]))
     evaluation_env = wrap_vec_env(DummyVecEnv([make_env(RGB)]))
 
     # Create the agent
-    agent = ppo.PPO(
+    agent = PPO(
         policy=policies.ActorCriticCnnPolicy,
         env=training_env,
         learning_rate=LEARNING_RATE,
@@ -167,10 +199,13 @@ def train():
 
 
 # Demo the agent
-def demo():
+def demo() -> None:
+    """
+    Run a demo of the trained PPO agent.
+    """
     # Load moedel
     model_path = Path(MODEL_DIR) / MODEL_NAME
-    model = ppo.PPO.load(model_path)
+    model = PPO.load(model_path)
 
     # Create the demo environment
     demo_env = wrap_vec_env(DummyVecEnv([make_env(HUMAN)]))
@@ -189,7 +224,10 @@ def demo():
     demo_env.close()
 
 
-def main():
+def main() -> None:
+    """
+    Main function to parse arguments and run training or demo.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--train", action="store_true")
     args = parser.parse_args()

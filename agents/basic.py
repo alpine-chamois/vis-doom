@@ -7,8 +7,7 @@ import gymnasium
 from gymnasium import Env, ObservationWrapper
 from gymnasium.envs.registration import register
 from stable_baselines3.ppo import PPO
-from stable_baselines3.common import callbacks
-from stable_baselines3.common import policies
+from stable_baselines3.common import callbacks, policies
 from stable_baselines3.common.vec_env import (
     SubprocVecEnv,
     DummyVecEnv,
@@ -240,3 +239,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

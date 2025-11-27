@@ -1,11 +1,10 @@
 import argparse
 from pathlib import Path
 from typing import Callable
-import cv2
-import numpy as np
 import gymnasium
-from gymnasium import Env, ObservationWrapper
 from gymnasium.envs.registration import register
+from gymnasium import Env
+from gymnasium.wrappers import TransformReward
 from stable_baselines3.ppo import PPO
 from stable_baselines3.common import callbacks
 from stable_baselines3.common import policies
@@ -17,7 +16,7 @@ from stable_baselines3.common.vec_env import (
     VecEnv,
 )
 from stable_baselines3.common.monitor import Monitor
-from gymnasium.wrappers import TransformReward
+from wrappers import FrameSkipWrapper, ResizeWrapper, ScreenWrapper
 
 # Config
 ENV = "MyVizdoomBasic-v0"
@@ -26,7 +25,6 @@ CFG_FILE = SCENARIO_DIR / "basic.cfg"
 LOG_NAME = "basic"
 LOG_DIR = "logs/basic/"
 MODEL_DIR = "models/basic/"
-OBS_KEY = "screen"
 MODEL_NAME = "best_model.zip"
 RGB = "rgb_array"
 HUMAN = "human"
@@ -52,81 +50,6 @@ register(
         "scenario_file": CFG_FILE,
     },
 )
-
-
-class ScreenWrapper(ObservationWrapper):
-    """
-    Wrapper to extract the screen from the observation dictionary.
-    """
-
-    def __init__(self, env: Env) -> None:
-        super().__init__(env)
-        # Update onservation space
-        self.observation_space = env.observation_space[OBS_KEY]  # type: ignore
-
-    def observation(self, observation: dict) -> np.ndarray:
-        """
-        Extract the screen from the observation dictionary.
-        """
-        return observation[OBS_KEY]
-
-
-class ResizeWrapper(ObservationWrapper):
-    """
-    Wrapper to resize the observation to the given width and height.
-    """
-
-    def __init__(self, env: Env, width: int, height: int) -> None:
-        super().__init__(env)
-        self.width = width
-        self.height = height
-        # Update observation space
-        self.observation_space = gymnasium.spaces.Box(
-            low=0,
-            high=255,
-            shape=(self.height, self.width, env.observation_space.shape[2]),  # type: ignore
-            dtype=np.uint8,
-        )
-
-    def observation(self, observation: np.ndarray) -> np.ndarray:
-        """
-        Resize the observation to the specified width and height.
-        """
-        observation = cv2.resize(
-            observation, (self.width, self.height), interpolation=cv2.INTER_AREA
-        )
-        return observation
-
-
-class FrameSkipWrapper(gymnasium.Wrapper):
-    """
-    Wrapper to implement frame skipping without affecting rendering.
-    """
-
-    def __init__(self, env: Env, skip: int) -> None:
-        super().__init__(env)
-        self.skip = skip
-
-    def step(self, action: np.ndarray) -> tuple[np.ndarray, float, bool, bool, dict]:
-        """
-        Repeat action, sum reward, and render all intermediate frames.
-        """
-        total_reward: float = 0.0
-        obs: np.ndarray = np.array([])
-        terminated: bool = False
-        truncated: bool = False
-
-        for _ in range(self.skip):
-            obs, reward, terminated, truncated, info = self.env.step(action)
-            total_reward += reward  # type: ignore
-
-            # Always render intermediate frames
-            self.env.render()
-
-            if terminated or truncated:
-                break
-
-        return obs, total_reward, terminated, truncated, info
 
 
 def make_env(render_mode: str) -> Callable[[], Env]:

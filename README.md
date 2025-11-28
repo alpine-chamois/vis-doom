@@ -1,17 +1,21 @@
 # vis-doom
 Training a visual RL agent to play Doom like it's 1993!
 
-## Installation
-[Install UV](https://docs.astral.sh/uv/getting-started/installation/), then run:
+## Setup
+[Install UV](https://docs.astral.sh/uv/getting-started/installation/), then run the folowing commands:
 
-```uv sync```
+```
+uv sync
+set PYTHONPATH=src
+```
 
 ## Basic Agent
 Run the following commands to train, and monitor the agent:
 
-```uv run -m visdoom.agents.basic --train```
-
-```tensorboard --logdir logs```
+```
+uv run -m visdoom.agents.basic --train
+tensorboard --logdir logs
+```
 
 ![Training Plots](/images/basic-training.png)
 

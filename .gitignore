@@ -3,6 +3,8 @@ __pycache__
 _vizdoom.ini
 logs/*
 logs/basic/*
+
+# Allow best model logs
 !logs/basic/
 !logs/basic/best_model/
 !logs/basic/best_model/**

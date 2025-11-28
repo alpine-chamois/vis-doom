@@ -9,7 +9,7 @@ Training a visual RL agent to play Doom like it's 1993!
 ## Basic Agent
 Run the following commands to train, and monitor the agent:
 
-```uv run agents/basic.py --train```
+```uv run -m visdoom.agents.basic --train```
 
 ```tensorboard --logdir logs```
 
@@ -17,6 +17,6 @@ Run the following commands to train, and monitor the agent:
 
 Run the following command to demo the trained agent:
 
-```uv run agents/basic.py```
+```uv run -m visdoom.agents.basic```
 
 ![Basic Scenario](/images/basic-render.png)

@@ -5,8 +5,7 @@ Training a visual RL agent to play Doom like it's 1993!
 [Install UV](https://docs.astral.sh/uv/getting-started/installation/), then run the folowing commands:
 
 ```
-uv sync
-set PYTHONPATH=src
+uv pip install -e .
 ```
 
 ## Basic Agent

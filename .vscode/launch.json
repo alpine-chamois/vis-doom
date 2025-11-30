@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug visdoom.agents.basic (train)",
+            "type": "python",
+            "request": "launch",
+            "module": "visdoom.agents.basic",
+            "args": ["--train"],
+            "justMyCode": false
+        },
+        {
+            "name": "Debug visdoom.agents.basic",
+            "type": "python",
+            "request": "launch",
+            "module": "visdoom.agents.basic",
+            "args": [],
+            "justMyCode": false
+        }
+    ]
+}

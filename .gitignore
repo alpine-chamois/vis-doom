@@ -3,6 +3,7 @@ __pycache__
 _vizdoom.ini
 logs/*
 logs/basic/*
+vis_doom.egg-info
 
 # Allow best model logs
 !logs/basic/

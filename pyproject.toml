@@ -10,6 +10,10 @@ dependencies = [
     "stable_baselines3",
     "tensorboard",
     "numpy",
-    "opencv-python",
-    "argparse"
+    "opencv-python"
 ]
+
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+

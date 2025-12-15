@@ -13,7 +13,7 @@ Run the following commands to train, and monitor the agent:
 
 ```
 uv run -m visdoom.agents.basic --train
-tensorboard --logdir logs
+tensorboard --logdir models/basic
 ```
 
 ![Training Plots](/images/basic-training.png)

@@ -22,7 +22,6 @@ ENV = "MyVizdoomBasic-v0"
 SCENARIO_DIR = Path.cwd() / "scenarios"
 CFG_FILE = SCENARIO_DIR / "basic.cfg"
 LOG_NAME = "basic"
-LOG_DIR = "logs/basic/"
 MODEL_DIR = "models/basic/"
 MODEL_NAME = "best_model.zip"
 RGB = "rgb_array"
@@ -95,7 +94,7 @@ def train() -> None:
         policy=policies.ActorCriticCnnPolicy,
         env=training_env,
         learning_rate=LEARNING_RATE,
-        tensorboard_log=LOG_DIR,
+        tensorboard_log=MODEL_DIR,
         n_steps=N_STEPS,
         verbose=VERBOSE,
     )
@@ -106,7 +105,7 @@ def train() -> None:
         n_eval_episodes=NUM_EVAL_EPISODES,
         eval_freq=EVAL_FREQ,
         best_model_save_path=MODEL_DIR,
-        log_path=LOG_DIR,
+        log_path=MODEL_DIR,
     )
 
     # Train the agent

@@ -20,13 +20,13 @@ from visdoom.wrappers import FrameSkipWrapper, ResizeWrapper, ScreenWrapper
 # Config
 ENV = "MyVizdoomBasic-v0"
 SCENARIO_DIR = Path.cwd() / "scenarios"
-CFG_FILE = SCENARIO_DIR / "basic.cfg"
-LOG_NAME = "basic"
-MODEL_DIR = "models/basic"
+CFG_FILE = SCENARIO_DIR / "defend_the_center.cfg"
+LOG_NAME = "defend_the_centre"
+MODEL_DIR = "models/defend_the_centre"
 MODEL_NAME = "best_model.zip"
 RGB = "rgb_array"
 HUMAN = "human"
-TRAINING_STEPS = 25000
+TRAINING_STEPS = 50000
 FRAME_SKIP = 4
 FRAME_STACK = 4
 NUM_ENVS = 4
@@ -35,10 +35,10 @@ EVAL_FREQ = 500
 LEARNING_RATE = 1e-3
 N_STEPS = 128
 VERBOSE = 1
-REWARD_SCALE = 0.01
+REWARD_SCALE = 1
 SCREEN_WIDTH = 80
 SCREEN_HEIGHT = 60
-NUM_DEMO_EPISODES = 10
+NUM_DEMO_EPISODES = 2
 
 # Register custom VizDoom environment with local scenario file
 register(

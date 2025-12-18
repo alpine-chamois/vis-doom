@@ -6,7 +6,9 @@
             "type": "python",
             "request": "launch",
             "module": "visdoom.agents.basic",
-            "args": ["--train"],
+            "args": [
+                "--train"
+            ],
             "justMyCode": false
         },
         {
@@ -14,6 +16,24 @@
             "type": "python",
             "request": "launch",
             "module": "visdoom.agents.basic",
+            "args": [],
+            "justMyCode": false
+        },
+        {
+            "name": "Debug visdoom.agents.defend_the_centre (train)",
+            "type": "python",
+            "request": "launch",
+            "module": "visdoom.agents.defend_the_centre",
+            "args": [
+                "--train"
+            ],
+            "justMyCode": false
+        },
+        {
+            "name": "Debug visdoom.agents.defend_the_centre",
+            "type": "python",
+            "request": "launch",
+            "module": "visdoom.agents.defend_the_centre",
             "args": [],
             "justMyCode": false
         }

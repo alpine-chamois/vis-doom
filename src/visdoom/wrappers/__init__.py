@@ -1,5 +1,5 @@
-from .frameskipwrapper import FrameSkipWrapper
-from .resizewrapper import ResizeWrapper
-from .screenwrapper import ScreenWrapper
+from .frame_skip_wrapper import FrameSkipWrapper
+from .resize_wrapper import ResizeWrapper
+from .screen_wrapper import ScreenWrapper
 
 __all__ = ["FrameSkipWrapper", "ResizeWrapper", "ScreenWrapper"]

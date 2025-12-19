@@ -39,6 +39,5 @@ Run the following command to demo the trained agent:
 
 ## Todo
 
-* Successive agents should pre-load the previous model to enable curriculum learning.
 * Implement **Deadly Corridor** and **Deathmatch** agents.
 * Refactor common agent code into a separate class.

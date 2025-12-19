@@ -36,3 +36,9 @@ tensorboard --logdir models/defend_the_centre
 Run the following command to demo the trained agent:
 
 ```uv run -m visdoom.agents.defend_the_centre```
+
+## Todo
+
+* Successive agents should pre-load the previous model to enable curriculum learning.
+* Implement **Deadly Corridor** and **Deathmatch** agents.
+* Refactor common agent code into a separate class.

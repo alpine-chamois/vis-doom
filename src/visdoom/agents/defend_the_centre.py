@@ -18,7 +18,7 @@ from stable_baselines3.common.monitor import Monitor
 from visdoom.wrappers import FrameSkipWrapper, ResizeWrapper, ScreenWrapper
 
 # Config
-ENV = "MyVizdoomBasic-v0"
+ENV = "vis-doom-v0"
 SCENARIO_DIR = Path.cwd() / "scenarios"
 CFG_FILE = SCENARIO_DIR / "defend_the_center.cfg"
 LOG_NAME = "defend_the_centre"
@@ -161,3 +161,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

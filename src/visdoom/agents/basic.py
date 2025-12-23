@@ -105,7 +105,6 @@ def train() -> None:
         n_eval_episodes=NUM_EVAL_EPISODES,
         eval_freq=EVAL_FREQ,
         best_model_save_path=MODEL_DIR,
-        log_path=MODEL_DIR,
     )
 
     # Train the agent
@@ -161,4 +160,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
 

@@ -37,7 +37,20 @@ Run the following command to demo the trained agent:
 
 ```uv run -m visdoom.agents.defend_the_centre```
 
+
+## Deadly Corridor Agent
+Run the following commands to train, and monitor the agent:
+
+```
+uv run -m visdoom.agents.deadly_corridor --train
+tensorboard --logdir models/deadly_corridor
+```
+
+Run the following command to demo the trained agent:
+
+```uv run -m visdoom.agents.deadly_corridor```
+
 ## Todo
 
-* Implement **Deadly Corridor** and **Deathmatch** agents.
+* Implement **Deathmatch** agents.
 * Refactor common agent code into a separate class.

@@ -31,7 +31,7 @@ FRAME_SKIP = 4
 FRAME_STACK = 4
 NUM_ENVS = 4
 NUM_EVAL_EPISODES = 10
-EVAL_FREQ = 500
+EVAL_FREQ = 1000
 LEARNING_RATE = 1e-3
 N_STEPS = 128
 VERBOSE = 1
@@ -160,5 +160,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-

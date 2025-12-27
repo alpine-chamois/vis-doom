@@ -26,14 +26,14 @@ MODEL_DIR = "models/deadly_corridor"
 MODEL_NAME = "best_model.zip"
 RGB = "rgb_array"
 HUMAN = "human"
-TRAINING_STEPS = 50000
+TRAINING_STEPS = 200000
 FRAME_SKIP = 4
 FRAME_STACK = 4
 NUM_ENVS = 4
 NUM_EVAL_EPISODES = 10
-EVAL_FREQ = 500
-LEARNING_RATE = 1e-3
-N_STEPS = 128
+EVAL_FREQ = 4000
+LEARNING_RATE = 2.5e-4
+N_STEPS = 512
 VERBOSE = 1
 REWARD_SCALE = 1
 SCREEN_WIDTH = 80
@@ -105,7 +105,6 @@ def train() -> None:
         n_eval_episodes=NUM_EVAL_EPISODES,
         eval_freq=EVAL_FREQ,
         best_model_save_path=MODEL_DIR,
-        log_path=MODEL_DIR,
     )
 
     # Train the agent

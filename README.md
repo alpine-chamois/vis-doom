@@ -24,7 +24,6 @@ Run the following command to demo the trained agent:
 
 ![Basic Scenario](/images/basic-render.png)
 
-
 ## Defend the Centre Agent
 Run the following commands to train, and monitor the agent:
 
@@ -36,7 +35,6 @@ tensorboard --logdir models/defend_the_centre
 Run the following command to demo the trained agent:
 
 ```uv run -m visdoom.agents.defend_the_centre```
-
 
 ## Deadly Corridor Agent
 Run the following commands to train, and monitor the agent:

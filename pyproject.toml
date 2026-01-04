@@ -1,0 +1,21 @@
+[project]
+name = "vis-doom"
+version = "0.1.0"
+description = "Training a visual RL agent to play Doom like it's 1993!"
+readme = "README.md"
+requires-python = "==3.12.*"
+dependencies = [
+    "vizdoom",
+    "gymnasium",
+    "stable_baselines3",
+    "tensorboard",
+    "numpy",
+    "opencv-python"
+]
+
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+visdoom = "visdoom.cli:main"

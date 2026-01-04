@@ -1,0 +1,8 @@
+# Scenario-specific hyperparameters
+training_steps = 2000000
+learning_rate = 0.0001
+n_steps = 4096
+reward_scale = 0.01
+ent_coef = 0.01
+eval_freq = 50000
+num_demo_episodes = 2

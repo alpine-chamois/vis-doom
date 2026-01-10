@@ -1,0 +1,30 @@
+[project]
+name = "vis-doom"
+version = "0.1.0"
+description = "Training visual deep reinforcement learning agents to play Doom like it's 1993!"
+readme = "README.md"
+requires-python = "==3.12.*"
+dependencies = [
+    "torch",
+    "vizdoom",
+    "gymnasium",
+    "stable_baselines3",
+    "tensorboard",
+    "numpy",
+    "opencv-python"
+]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu126" }
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+visdoom = "visdoom.cli:main"
